@@ -1,6 +1,15 @@
 var express    = require('express'),
     app        = express(),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    mongoose   = require('mongoose'),
+    Contato    = require('./models/contatos');
+
+//Conexao com o mongodb
+mongoose.connect('mongodb://localhost/waibapi', function(err){
+  if(err){
+    console.log('Erro ao conectar no mongodb: '+err);
+  }
+});
 
 app.use(bodyParser());
 
@@ -15,11 +24,23 @@ router.get('/', function(req, res) {
 
 router.route('/contatos')
   .get(function(req,res){
-    res.json({ message: 'Contatos - GET' });
+    Contato.find(function(err,rows){
+      if(err){
+        res.send(err);
+      }
+      res.json(rows);
+    });
   })
   .post(function(req,res){
-    var value = req.body.nome;
-    res.json({ message: value });
+    var model  = new Contato();
+    model.nome = req.body.nome;
+
+    model.save(function(err){
+      if(err){
+        res.send(err);
+      }
+      res.json({message: 'Contato cadastrado com sucesso!'});
+    })
   })
 
 // registrando as rotas
