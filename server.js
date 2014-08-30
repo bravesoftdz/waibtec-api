@@ -41,7 +41,40 @@ router.route('/contatos')
       }
       res.json({message: 'Contato cadastrado com sucesso!'});
     })
+  });
+
+router.route('/contatos/:id')
+  .get(function(req,res){
+    Contato.findById(req.params.id, function(err, row){
+      if(err){
+        res.send(err)
+      }
+      res.json(row);
+    });
   })
+  .put(function(req,res){
+    Contato.findById(req.params.id, function(err, row){
+      if(err){
+        res.send(err);
+      }
+
+      row.nome = req.body.nome;
+      row.save(function(err){
+        if(err){
+          res.send(err);
+        }
+        res.json({message: 'Contato atualizado com sucesso!'});
+      })
+    })
+  })
+  .delete(function(req,res){
+    Contato.remove({_id: req.params.id}, function(err, row){
+      if(err){
+        res.send(err);
+      }
+      res.json({message: 'Contato excluído com sucesso!'});
+    });
+  });
 
 // registrando as rotas
 app.use('/api', router);
